@@ -8,20 +8,21 @@ Cocos Creator 2.4.x relies heavily on global state (`window.cc`), synchronous mo
 
 While Cocos 3.x natively embraces ESM, many studios still maintain legacy 2.4 projects. This project is a technical exploration of forcing compatibility **without rewriting the engine from scratch**. It is not just a port; it's a structural organ transplant.
 
-## Build Output
+## 📊 Build Output
 
-O processo de build consolida todos os assets e o motor Cocos em um único arquivo HTML, otimizado com compressão Brotli.
+The build process consolidates all assets and the Cocos engine into a single HTML file, optimized with Brotli compression.
 
-### Exemplo de Log de Sucesso:
+### Successful log example:
 ```shell
 ✓ built in 258ms
 🚀 Injecting Cocos Engine on the final HTML...
 ✅ Success! finalized HTML: 4137.47 kB
 
-# Verificação de arquivos gerados (dist):
+# Verification of generated files (dist):
 $ ls -lh dist/index.html*
 -rw-r--r-- 1 user user 4.1M Mar  8 19:11 dist/index.html
 -rw-r--r-- 1 user user 461K Mar  8 19:11 dist/index.html.br
+```
 
 ## 🛠️ The Architecture & Solutions
 
@@ -52,3 +53,4 @@ npm run dev
 
 # Build for Production (Minified & Brotli Compressed)
 npm run build
+```
