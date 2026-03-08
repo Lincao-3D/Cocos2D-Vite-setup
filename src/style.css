@@ -1,0 +1,28 @@
+/* style.css - SIMPLIFIED */
+body { margin: 0; padding: 0; background: #1a1a1a; overflow: hidden; }
+#GameCanvas { 
+    display: block; 
+    outline: none;
+    /* DELETE: max-width, max-height, aspect-ratio, object-fit */
+}
+
+
+#Cocos2dGameContainer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* Old commented out code (kept)
+html, body {
+  margin: 0; padding: 0; width: 100vw; height: 100vh; background-color: #000; overflow: hidden;
+}
+
+#GameCanvas.old {
+  align-self: center; padding: 540; display: block; width: 100%; height: 100%; outline: none;
+} */

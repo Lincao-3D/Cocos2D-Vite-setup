@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Vite Cocos Build</title>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg">
+    <meta charset="UTF-8">
+    <script>
+        // A. Capturing single property definition
+        const _origDefineProperty = Object.defineProperty;
+        Object.defineProperty = function(obj, prop, descriptor) {
+            try {
+                return _origDefineProperty(obj, prop, descriptor);
+            } catch (e) {
+                if (e instanceof TypeError && e.message.includes('Cannot redefine property')) {
+                    console.warn(`🛡️ [CDP Shield] Redefinition conflict ignored: [${String(prop)}]`);
+                    return obj;
+                }
+                throw e; // Throws other, real errors
+            }
+        };
+
+        // B. Capturing multiple property definitions (this fixes the 'loader' error)
+        const _origDefineProperties = Object.defineProperties;
+        Object.defineProperties = function(obj, props) {
+            try {
+                return _origDefineProperties(obj, props);
+            } catch (e) {
+                if (e instanceof TypeError && e.message.includes('Cannot redefine property')) {
+                    console.warn(`🛡️ [CDP Shield] Conflict in defineProperties. Manual property injection...`);
+                    // Try applying each property individually
+                    for (const key in props) {
+                        try {
+                            _origDefineProperty(obj, key, props[key]);
+                        } catch (err) {
+                            console.warn(`  ↳ 🛡️ Ignored: [${key}]`);
+                        }
+                    }
+                    return obj;
+                }
+                throw e;
+            }
+        };
+
+        // C. Renderer structure reconstruction (protection against RenderComponentHandle error)
+        window.cc = window.cc || {};
+        window.cc.renderer = window.cc.renderer || {};
+        window.cc.gfx = window.cc.gfx || {};
+
+        const re = window.cc.renderer.renderEngine = window.cc.renderer.renderEngine || {};
+        const MockFn = function() {};
+        
+        re.RenderComponentHandle = MockFn;
+        re.NodeProxy = MockFn;
+        re.CanvasProxy = MockFn;
+        re.Assembler = MockFn;
+        window.cc.renderer.RenderComponentHandle = MockFn;
+        window.cc.gfx.RenderComponentHandle = MockFn;
+    </script>
+
+    <script src="/libs/cocos2d-js-min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a1a;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #GameDiv {
+            width: 100%;
+            max-width: 1080px;
+            aspect-ratio: 1080 / 576;
+            height: auto;
+            position: relative;
+            margin: 0 auto;
+            /* Centers div on the screen. */
+            background: #000;
+            overflow: hidden;
+        }
+
+        /* #GameDiv {
+            width: 1080px;
+            height: 576px;
+            position: relative;
+        } */
+
+        #GameCanvas {
+            width: 100% !important;
+            height: 100% !important;
+            outline: none;
+            background: #000;
+            display: block;
+        }
+    </style>
+    <script>
+        // Robust mock to avoid RenderComponentHandle error if the engine is slow or if we are in build mode
+        (function () {
+            function MockFn() { }
+            window.cc = window.cc || {};
+
+            // So as to ensure that cc.renderer exists
+            window.cc.renderer = window.cc.renderer || {};
+
+            // Ensures renderEngine do exist in the renderer
+            const re = window.cc.renderer.renderEngine = window.cc.renderer.renderEngine || {};
+
+            // Define handles if they don't exist
+            re.RenderComponentHandle = re.RenderComponentHandle || MockFn;
+            re.NodeProxy = re.NodeProxy || MockFn;
+            re.CanvasProxy = re.CanvasProxy || MockFn;
+            re.Assembler = re.Assembler || MockFn;
+
+            window.cc.renderer.ForwardRenderer = window.cc.renderer.ForwardRenderer || MockFn;
+            window.cc.RenderFlow = window.cc.RenderFlow || { init: MockFn };
+        })();
+    </script>
+</head>
+
+<body>
+    <div id="GameDiv">
+        <canvas id="GameCanvas" width="1080" height="576"></canvas>
+    </div>
+    <script type="module" src="./src/main.ts"></script>
+</body>
+
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "build-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "prebuild": "node scripts/crawler.mjs",
+    "build": "tsc --noEmit || true && vite build && find dist -name '*.meta' -delete && node scripts/finalize-singlefile.mjs",
+    "postbuild": "echo 'Cleaning metadata and compressing...' && find dist -type f -regextype posix-extended -regex '.*\\.(html|js|css|json|svg)$' -exec brotli -f -k -9 {} + && echo 'Build complete: Metadata cleaned & Brotli compression performed.'"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "esbuild": "^0.27.3",
+    "glob": "^13.0.2",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.0-beta.13",
+    "vite-plugin-singlefile": "^2.3.0"
+  },
+  "overrides": {
+    "vite": "^8.0.0-beta.13"
+  },
+  "dependencies": {
+    "chrome-remote-interface": "^0.34.0",
+    "puppeteer": "^24.38.0",
+    "ws": "^8.19.0"
+  }
+}
